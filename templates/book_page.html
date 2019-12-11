@@ -1,0 +1,101 @@
+{% extends "layout.html" %}
+
+{% block heading %}
+    <style>
+      body {background-color: silver;
+            margin-bottom: 50px;}
+      .table tr td:first-child {
+        text-align: right;
+      }
+      .table tr td:last-child {
+        text-align: left;
+      }
+    </style>
+{% endblock %}
+
+{% block body %}
+<div class="text-right m-2">
+    <form action="{{ url_for('logout') }}" method="post"><button class="btn btn-outline-danger btn-sm">Logout</button></form>
+  </div>
+<div class="container-fluid">
+  <div class="row justify-content-beetwen align-items-center mr-1 ml-1">
+    <div class="col-12 col-md-6 mb-4 p-0 p-md-2">
+      <div class="card text-center text-white bg-primary font-weight-bold">
+        <div class="card-header">
+          <h3 class="card-title">  {{ book['title'] }}</h3>
+        </div>
+        <div class="card-body">
+          <table class="table table-hover table-secondary">
+            <tr>
+              <td>Author</td>
+              <td>{{ book['author'] }}</td>
+            </tr>
+            <tr>
+              <td>Publication year</td>
+              <td>{{ book['year'] }}</td>
+            </tr>
+            <tr>
+              <td>ISBN</td>
+              <td>{{ book['isbn'] }}</td>
+            </tr>
+            <tr>
+              <td>Goodreads average rating</td>
+              <td>{{ book['gr_avr'] }}</td>
+            </tr>
+            <tr>
+              <td>Goodreads numbers of ratings</td>
+              <td>{{ book['gr_rev'] }}</td>
+            </tr>
+          </table>
+          <a href="{{ url_for('profile', username = username) }}" class="btn btn-dark">Search Back</a>
+        </div>
+      </div>
+    </div>
+  
+    {% set star=['/static/images/star','.png'] %}
+    {% if book['review'] %}
+      <div class="card col-12 col-md-6 mb-1">
+      <div class="card-body">
+            <h5 class="card-title text-capitalize">Your review: <img src="{{ star|join(book['review']['rating']) }}" height="20" alt="star"></h5>
+            <p class="card-text">{{ book['review']['text'] }}</p>
+        </div>
+    </div>
+    {% else %}
+      <div class="col-12 col-md-6 p-2 mb-1 bg-light rounded">
+        <form action = "{{ url_for('book_page', isbn = book['isbn']) }}" method="post">
+          <div class="form-list">
+            <label class="pt-2"> Rating: </label>
+              <input type="radio" name="rating" value="1" checked>1
+              <input type="radio" name="rating" value="2">2
+              <input type="radio" name="rating" value="3">3
+              <input type="radio" name="rating" value="4">4
+              <input type="radio" name="rating" value="5">5
+              <hr>
+              <textarea class="w-100 border-success" name="review" maxlength="200" rows="5" placeholder="Enter your review. Max 200 characters" required></textarea>
+              <div class="text-right"><button class="btn btn-dark mb-3">Submit</button></div>
+          </div>
+        </form>
+        {% if book['error_msg'] %}
+        <footer class="alert alert-danger">{{ book['error_msg'] }}</footer>
+        {% endif %}
+      </div>     
+    {% endif %}
+  </div>
+    
+  {% if book['rev_users'] %}
+    <div class="row justify-content-beetwen align-items-center mr-1 ml-1">
+      {% for review in book['rev_users'] %}
+        <div class="card col-12 col-md-6 mb-1">
+          <div class="card-body">
+            <h5 class="card-title text-capitalize">{{ review['username'] }} <img src="{{ star|join(review['rating']) }}" height="20" alt="star"></h5>
+            <p class="card-text">{{ review['text'] }}</p>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+</div>
+
+
+{% endblock %}

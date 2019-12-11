@@ -1,0 +1,70 @@
+{% extends "layout.html" %}
+
+{% block heading %}
+    
+{% endblock %}
+
+{% block body %}
+
+    {% if username  %}
+    <div class="jumbotron pt-1 bg-warning rounded-0">
+        <div class="text-right">
+        <form action="{{ url_for('logout') }}" method="post"><button class="btn btn-outline-danger btn-sm">Logout</button></form>
+        </div>
+        <h1 class="display-4 font-weight-bold"><span class="text-capitalize">{{ username }}</span>, Welcome to Libropedia!</h1>
+        <p class="lead font-italic">Enjoy your books.</p>
+    </div>
+    
+    {% endif %}
+
+    <div class="container">
+        <form action="{{ url_for('book_search') }}" method="get">
+            <div class="row form-group font-weight-bold">
+                <label  class="col-3 col-md-1 col-form-label text-right">ISBN:</label>
+                <div class="col-9 col-md-5">                    
+                    <input class="form-control" type="text" name="isbn">                
+                </div>
+            </div>
+            <div class="row form-group font-weight-bold">
+                <label  class="col-3 col-md-1 col-form-label text-right">Title:</label>
+                <div class="col-9 col-md-5">                    
+                    <input class="form-control" type="text" name="title">                
+                </div>
+            </div>
+            <div class="row form-group font-weight-bold">
+                <label  class="col-3 col-md-1 col-form-label text-right">Author:</label>
+                <div class="col-9 col-md-5">                    
+                    <input class="form-control" type="text" name="author">                
+                </div>
+            </div>
+            <div class="row form-group">
+                <div class="col-3">
+                    <button type='submit' class="btn btn-outline-success">Search</button>
+                </div>
+            </div>
+        </form>
+        <div class="row">
+            <div class="col-12 col-md-6">
+                {% if message %}
+                    <p class="alert alert-danger font-weight-bold">{{ message }}</p>
+                {% endif%}
+            </div>
+        </div>
+    </div>
+    <div class="container-fluid ml-2">
+        <div class="row flex-wrap">
+            {% if books_find %}
+                {% for book in books_find %}
+                    {% if book %}
+                        <ul class="list-group mb-1 col-12 col-md-6">
+                            <a href="{{ url_for('book_page', isbn = book.isbn) }}" class="text-dark">
+                            <li class="list-group-item list-group-item-action list-group-item-dark font-weight-bold">
+                            {{ book.title }} - {{ book.author }} - {{ book.year }} - ISBN: {{ book.isbn }}</a></li>
+                        </ul>
+                    {% endif %}
+                {% endfor %}
+            {% endif %}
+        </div>
+    </div>
+
+{% endblock %}
