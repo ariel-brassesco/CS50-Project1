@@ -193,6 +193,10 @@ def api_info(isbn):
     try:
         res = db.execute(select).first()
         db.commit()
+
+        # To avoid error with api request
+        if not res.count:
+            return False
     except:
         return False
 
@@ -200,24 +204,20 @@ def api_info(isbn):
     info['average_score'] = round(float(res.avg),2)
 
     return info
-        
-        
-        
 
 
 def main():
-
-    #test = '142563B523'
-    isbn = '1416949658'
-
-    '''select = f"SELECT COUNT(reviews.*), AVG(rating) FROM reviews JOIN books ON reviews.id_book = books.id"# IN (SELECT id FROM books WHERE isbn = '{isbn}')"
-    res = db.execute(select).first()
-    db.commit()
-    print(res)
-    print(res.count)
-    print(round(res.avg,2))'''
     
-    print(check_user(None))
+    # An exaple of the API request
+    import requests    
+    
+    username = 'ariel'
+    isbn = '1416949658'
+    #res = requests.get("http://127.0.0.1:5000/api/1416949658") # This is not work, is only for users. 
+    
+    # This is the request way outside the browser
+    res = requests.get("http://127.0.0.1:5000/api", params = {'username': username, 'isbn': isbn})
+    print(res.text,res.status_code)
     
 
 if __name__ == "__main__":

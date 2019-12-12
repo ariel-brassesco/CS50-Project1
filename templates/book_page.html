@@ -85,12 +85,14 @@
   {% if book['rev_users'] %}
     <div class="row justify-content-beetwen align-items-center mr-1 ml-1">
       {% for review in book['rev_users'] %}
-        <div class="card col-12 col-md-6 mb-1">
+      <div class="col-12 col-md-6 mb-1 p-0 p-md-1">
+        <div class="card">
           <div class="card-body">
             <h5 class="card-title text-capitalize">{{ review['username'] }} <img src="{{ star|join(review['rating']) }}" height="20" alt="star"></h5>
             <p class="card-text">{{ review['text'] }}</p>
           </div>
         </div>
+      </div>
       {% endfor %}
     </div>
   {% endif %}

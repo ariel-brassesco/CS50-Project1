@@ -57,7 +57,10 @@ def user_check():
     # Get the username and password from the form
     username = request.form.get("username")
     password = request.form.get("password")
-   
+    
+    if not ut.check_user(username):
+        return render_template("index.html", error_msg="The username is not valid.")
+
     # Check if the password is correct
     if not ut.check_login(username, password):
         return render_template("index.html", error_msg="Invalid password")
@@ -74,11 +77,13 @@ def user_check():
 # Render the profile template
 @app.route("/profile/<string:username>")
 def profile(username):
-    
+    if 'username' not in session:
+        return redirect(url_for('index'))
+
     return render_template("profile.html", username = username)
 
 # Logout function
-@app.route("/logout", methods = ['POST'])
+@app.route("/logout", methods = ['POST', 'GET'])
 def logout():
     session.pop('username', None)
     return redirect(url_for('index'))
@@ -86,6 +91,10 @@ def logout():
 
 @app.route("/book/search", methods=['GET'])
 def book_search():
+    
+    if 'username' not in session:
+        return redirect(url_for('index'))
+    
     # Search book
     isbn = request.args.get('isbn', None)
     title = request.args.get('title', None)
@@ -107,6 +116,9 @@ def book_search():
 @app.route("/book/<isbn>", methods = ['POST', 'GET'])
 def book_page(isbn):
     
+    if 'username' not in session:
+        return redirect(url_for('index'))
+
     if request.method == 'POST':
         rating = request.form.get('rating')
         review = request.form.get('review')
@@ -128,18 +140,41 @@ def book_page(isbn):
         
         return render_template('book_page.html', username = username, book = book_info)
 
+
 @app.route("/api/<isbn>")
 def book_api(isbn):
-   
-    if ('username' in session):
-        
-        res = ut.api_info(isbn)
-        
-        if not res:
-            message = "The ISBN doesn't match"
-            return jsonify(message), 404
-        else:
-            return jsonify(res), 200
-    else:   
+    
+    if 'username' not in session:
         message = "The API is only available for users. Please login or create an account."
         return jsonify(message), 404
+
+    res = ut.api_info(isbn)
+        
+    if not res:
+        message = "The ISBN doesn't match"
+        return jsonify(message), 404
+    else:
+        return jsonify(res), 200
+
+
+@app.route("/api")
+def api():
+    
+    isbn = request.args.get('isbn')
+    username = request.args.get('username')
+
+    if not ut.check_user(username):
+        message = "The username is not valid."
+        return jsonify(message), 404
+
+    res = ut.api_info(isbn)
+        
+    if not res:
+        message = "The ISBN doesn't match"
+        return jsonify(message), 404
+    else:
+        return jsonify(res), 200
+
+
+if __name__ == "__main__":
+    app.run(debug=True)
